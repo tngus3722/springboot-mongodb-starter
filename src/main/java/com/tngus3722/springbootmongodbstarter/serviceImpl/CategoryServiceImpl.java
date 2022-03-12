@@ -4,6 +4,7 @@ import com.tngus3722.springbootmongodbstarter.document.CategoryDocument;
 import com.tngus3722.springbootmongodbstarter.dto.request.CategoryPostRequest;
 import com.tngus3722.springbootmongodbstarter.dto.request.CategoryPutRequest;
 import com.tngus3722.springbootmongodbstarter.dto.response.CategoryResponse;
+import com.tngus3722.springbootmongodbstarter.event.TestPublisher;
 import com.tngus3722.springbootmongodbstarter.mapper.CategoryMapper;
 import com.tngus3722.springbootmongodbstarter.repository.CategoryRepository;
 import com.tngus3722.springbootmongodbstarter.service.CategoryService;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final TestPublisher testPublisher;
 
     @Override
     public CategoryResponse postCategory(CategoryPostRequest categoryPostRequest) {
@@ -29,7 +31,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .name(categoryPostRequest.getName())
                 .build();
         categoryRepository.save(categoryDocument);
-
+        testPublisher.publishEvent(categoryDocument.getId());
         return this.getCategory(categoryDocument.getId());
     }
 
