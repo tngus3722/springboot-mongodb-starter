@@ -20,6 +20,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryResponse postCategory(CategoryPostRequest categoryPostRequest) {
+        if (this.isCategoryExist(categoryPostRequest.getId())) {
+            throw new RuntimeException("category Already Exist");
+        }
+
         CategoryDocument categoryDocument = CategoryDocument.builder()
                 .id(categoryPostRequest.getId())
                 .name(categoryPostRequest.getName())
@@ -58,5 +62,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     private CategoryDocument getCategoryDocument(String categoryId) {
         return categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("document not found"));
+    }
+
+    private boolean isCategoryExist(String categoryId) {
+        return categoryRepository.findById(categoryId).isPresent();
     }
 }
