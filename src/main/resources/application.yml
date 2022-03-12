@@ -1,0 +1,14 @@
+#for mongoDB
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/display
+
+#for swagger ui
+project:
+  title: musinsa category test
+  version: 1.0.0
+token:
+  access: access_token
+  refresh: refresh_token
+
