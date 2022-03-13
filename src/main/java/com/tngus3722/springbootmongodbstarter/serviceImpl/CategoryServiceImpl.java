@@ -9,9 +9,13 @@ import com.tngus3722.springbootmongodbstarter.mapper.CategoryMapper;
 import com.tngus3722.springbootmongodbstarter.repository.CategoryRepository;
 import com.tngus3722.springbootmongodbstarter.service.CategoryService;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+import reactor.function.TupleUtils;
 
 @RequiredArgsConstructor
 @Service
@@ -19,6 +23,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final TestPublisher testPublisher;
+    private final ExecutorService customThreadPool;
 
     @Override
     public CategoryResponse postCategory(CategoryPostRequest categoryPostRequest) {
@@ -30,7 +35,6 @@ public class CategoryServiceImpl implements CategoryService {
                 .id(categoryPostRequest.getId())
                 .name(categoryPostRequest.getName())
                 .build();
-        System.out.println("postCategory " + Thread.currentThread());
         categoryRepository.save(categoryDocument);
         testPublisher.publishEvent(categoryDocument.getId());
         return this.getCategory(categoryDocument.getId());
@@ -62,6 +66,46 @@ public class CategoryServiceImpl implements CategoryService {
     public void deleteCategory(String categoryId) {
         categoryRepository.delete(this.getCategoryDocument(categoryId));
     }
+
+    @Override
+    public List<CategoryResponse> getCategoriesAsyncTest() {
+        long start = System.currentTimeMillis();
+
+        return Mono.zip(getCategoriesReactiveTest(),
+                        getCategoriesReactiveTest(),
+                        getCategoriesReactiveTest(),
+                        getCategoriesReactiveTest(),
+                        getCategoriesReactiveTest(),
+                        getCategoriesReactiveTest())
+                .map(TupleUtils.function(
+                        (a, b, c, d, e, f) -> {
+                            a.addAll(b);
+                            a.addAll(c);
+                            a.addAll(d);
+                            a.addAll(e);
+                            a.addAll(f);
+                            return a;
+                        }
+                ))
+                .doOnSuccess(o -> {
+                    System.out.println("Duration : " + (System.currentTimeMillis() - start));
+                }).block();
+
+    }
+
+    private Mono<List<CategoryResponse>> getCategoriesReactiveTest() {
+        return Mono.fromCallable(() -> {
+                    try {
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return categoryRepository.findAll().stream()
+                            .map(CategoryMapper.INSTANCE::toCategoryResponse)
+                            .collect(Collectors.toList());
+                }
+        ).subscribeOn(Schedulers.fromExecutorService(customThreadPool));
+    }
+
 
     private CategoryDocument getCategoryDocument(String categoryId) {
         return categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("document not found"));

@@ -16,4 +16,6 @@ public interface CategoryService {
     CategoryResponse putCategory(String categoryId, CategoryPutRequest categoryPutRequest);
 
     void deleteCategory(String categoryId);
+
+    List<CategoryResponse> getCategoriesAsyncTest();
 }

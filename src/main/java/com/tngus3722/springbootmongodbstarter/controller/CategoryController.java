@@ -51,4 +51,10 @@ public class CategoryController {
         categoryService.deleteCategory(categoryId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping("/categories-async")
+    public List<CategoryResponse> getCategoriesAsyncMultipleSix(){
+        return categoryService.getCategoriesAsyncTest();
+    }
 }
+

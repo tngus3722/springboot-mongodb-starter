@@ -33,6 +33,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	// reactive spring
 	implementation 'io.projectreactor:reactor-core:3.3.0.RELEASE'
+	implementation 'io.projectreactor.addons:reactor-extra'
 
 }
 
