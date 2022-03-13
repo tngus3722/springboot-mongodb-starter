@@ -11,6 +11,7 @@ public class TestPublisher {
     private final ApplicationEventPublisher publisher;
 
     public void publishEvent(String categoryId) {
+        System.out.println("publishEvent" + Thread.currentThread());
         publisher.publishEvent(new TestEvent(this, categoryId));
     }
 }

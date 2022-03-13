@@ -30,6 +30,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .id(categoryPostRequest.getId())
                 .name(categoryPostRequest.getName())
                 .build();
+        System.out.println("postCategory " + Thread.currentThread());
         categoryRepository.save(categoryDocument);
         testPublisher.publishEvent(categoryDocument.getId());
         return this.getCategory(categoryDocument.getId());
